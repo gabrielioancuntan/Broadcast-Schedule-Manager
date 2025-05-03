@@ -1,7 +1,11 @@
 <template>
-  <div class="broadcast-card-list">
-    <div class="broadcast-card" v-for="i in 6" :key="i">
-      <div class="broadcast-card-data">
+  <div class="row g-4 px-3 broadcast-card-list">
+    <div
+        class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3"
+        v-for="i in 6"
+        :key="i"
+    >
+      <div class="broadcast-card h-100">
         <div class="broadcast-preview">
           <h3>Time schedule</h3>
           <p>Starts at: 2025-05-02T08:00:00</p>
@@ -12,7 +16,7 @@
             <h6>Channel {{ i }}</h6>
             <h2>Morning News</h2>
           </div>
-          <div class="broadcast-edit-delete">
+          <div class="broadcast-edit-delete mt-auto">
             <p class="edit-broadcast"><i class="fa-solid fa-pencil"></i></p>
             <p class="delete-broadcast"><i class="fa-solid fa-trash"></i></p>
           </div>
@@ -28,14 +32,14 @@
 </script>
 
 <style scoped>
-.broadcast-card-data {
+.broadcast-card {
   display: flex;
   flex-direction: column;
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
-  margin: 20px;
   overflow: hidden;
+  height: 100%;
 }
 
 .broadcast-preview {
@@ -44,9 +48,14 @@
   padding: 20px;
 }
 
-.broadcast-preview h6,
+.broadcast-preview h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
 .broadcast-preview p {
-  margin: 0 0 10px 0;
+  margin: 0 0 8px 0;
+  font-size: 14px;
 }
 
 .broadcast-info {
@@ -63,15 +72,17 @@
   margin: 0;
   letter-spacing: 1px;
   text-transform: uppercase;
+  font-size: 13px;
 }
 
 .broadcast-channel-message h2 {
   letter-spacing: 1px;
   margin: 10px 0;
+  font-size: 20px;
+  color: #2A265F;
 }
 
 .broadcast-edit-delete {
-  margin-top: auto;
   display: flex;
   justify-content: flex-end;
   gap: 10px;
@@ -102,40 +113,5 @@
   background-color: #f4f4f4;
   transform: scale(1.05);
   color: #2A265F;
-}
-
-/* Grid for the cards */
-.broadcast-card-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));  /* Default for mobile */
-  gap: 10px;
-}
-
-/* Tablet: 2 cards per row */
-@media (min-width: 600px) {
-  .broadcast-card-list {
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  }
-}
-
-/* Desktop: 3 cards per row */
-@media (min-width: 900px) {
-  .broadcast-card-list {
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  }
-}
-
-/* Large desktop or wider screens: 4+ cards per row */
-@media (min-width: 1200px) {
-  .broadcast-card-list {
-    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-  }
-}
-
-/* Extra large screens: 5+ cards per row */
-@media (min-width: 1600px) {
-  .broadcast-card-list {
-    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-  }
 }
 </style>
