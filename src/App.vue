@@ -1,30 +1,29 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <div class="broadcast-cards">
+    <h1>Broadcast Schedule Manager</h1>
+
+    <BroadcastToolbar />
+    <BroadcastCard />
+  </div>
 </template>
 
+<script setup lang="ts">
+import BroadcastCard from "@/components/broadcastCard.vue";
+import BroadcastToolbar from "@/components/broadcastToolbar.vue";
+
+
+</script>
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.broadcast-cards {
+  padding: 20px;
+}
+
+.broadcast-cards h1 {
   text-align: center;
-  color: #2c3e50;
+  margin-bottom: 20px;
+  color: #2A265F;
+  font-size: 24px;
 }
 
-nav {
-  padding: 30px;
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
-}
 </style>
