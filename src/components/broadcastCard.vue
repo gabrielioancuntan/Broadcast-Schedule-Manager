@@ -1,32 +1,122 @@
 <template>
+<!--  <div-->
+<!--      v-if="editCardId === broadcast.id"-->
+<!--      class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3"-->
+<!--  >-->
+<!--    <addBroadcastCard-->
+<!--        :initial-values="broadcast"-->
+<!--        @onSubmit="saveEdit"-->
+<!--        @onCancel="cancelEdit"-->
+<!--    />-->
+<!--  </div>-->
+
+  <div v-if="props.isAdding" class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3">
+    <addBroadcastCard @onSubmit="handleSubmit" @onCancel="handleCancel" />
+  </div>
+
   <div class="row g-4 px-3 broadcast-card-list">
     <div
         class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3"
-        v-for="i in 6"
-        :key="i"
+        :class="{ 'is-overlap': broadcast.id === props.overlappingBroadcastId }"
+        v-for="broadcast in props.broadcasts"
+        :key="broadcast.id"
     >
-      <div class="broadcast-card h-100">
-        <div class="broadcast-preview">
-          <h3>Time schedule</h3>
-          <p>Starts at: 2025-05-02T08:00:00</p>
-          <p>Ends at: 2025-05-02T09:00:00</p>
-        </div>
-        <div class="broadcast-info">
-          <div class="broadcast-channel-message">
-            <h6>Channel {{ i }}</h6>
-            <h2>Morning News</h2>
-          </div>
-          <div class="broadcast-edit-delete mt-auto">
-            <p class="edit-broadcast"><i class="fa-solid fa-pencil"></i></p>
-            <p class="delete-broadcast"><i class="fa-solid fa-trash"></i></p>
-          </div>
-        </div>
+
+      <!-- Show editable form if this card is being edited -->
+      <addBroadcastCard
+          v-if="editCardId === broadcast.id"
+          :initial-values="broadcast"
+          @onSubmit="saveEdit"
+          @onCancel="cancelEdit"
+      />
+
+<div v-else>
+  <div class="broadcast-card h-100">
+    <div class="broadcast-preview">
+      <h3>Time schedule</h3>
+      <p>Starts at: {{broadcast.start}}</p>
+      <p>Ends at: {{broadcast.end}}</p>
+    </div>
+    <div class="broadcast-info">
+      <div class="broadcast-channel-message">
+        <h6>{{ broadcast.channel }}</h6>
+        <h2>{{broadcast.title}}</h2>
+      </div>
+      <div class="broadcast-edit-delete mt-auto">
+        <p @click="editCard( broadcast.id)" class="edit-broadcast"><i class="fa-solid fa-pencil"></i></p>
+        <p @click="deleteCard(broadcast.id)" class="delete-broadcast"><i class="fa-solid fa-trash"></i></p>
       </div>
     </div>
   </div>
+</div>
+
+
+      <div v-if="broadcast.id === props.overlappingBroadcastId" class="error-message">
+        This broadcast overlaps with an existing one!
+      </div>
+
+    </div>
+  </div>
+
 </template>
 
 <script setup lang="ts">
+import addBroadcastCard from "@/components/addBroadcastCard.vue";
+import {defineProps, defineEmits} from 'vue'
+import {Broadcasts} from "@/broadcasts";
+
+const props = defineProps({
+  broadcasts: {
+    type: Array as () => Broadcasts[],
+    required: true
+  },
+  isAdding: {
+    type: Boolean,
+    default: false
+  },
+  overlappingBroadcastId: {
+    type: String,
+    default: null
+  },
+  editCardId: {
+    type: String,
+    default: null
+  }
+})
+
+const emit = defineEmits<{
+  onSubmit: [broadcast: Broadcasts],
+  onCancel: [],
+  onDeleteCard: [id: string]
+  onEditCard: [id: string]
+  onSaveEdit: [broadcast: Broadcasts],
+  onCancelEdit: []
+}>();
+
+function saveEdit(broadcast: Broadcasts) {
+  emit('onSaveEdit', broadcast)
+}
+
+function cancelEdit() {
+  emit('onCancelEdit')
+}
+
+function deleteCard(id: string) {
+  console.log(id, 'id of the deleted card')
+  emit("onDeleteCard", id);
+}
+
+function editCard(id: string) {
+  emit("onEditCard", id);
+}
+
+function handleSubmit(broadcast: Broadcasts) {
+  emit("onSubmit", broadcast);
+}
+
+function handleCancel() {
+  emit("onCancel")
+}
 
 
 </script>
@@ -114,4 +204,29 @@
   transform: scale(1.05);
   color: #2A265F;
 }
+
+.is-overlap .broadcast-card {
+  border: 2px solid red;
+  animation: pulseBorder 0.6s ease-in-out;
+}
+
+.error-message {
+  margin-top: 10px;
+  color: red;
+  font-weight: 600;
+  text-align: center;
+}
+
+@keyframes pulseBorder {
+  0% {
+    border-color: red;
+  }
+  50% {
+    border-color: transparent;
+  }
+  100% {
+    border-color: red;
+  }
+}
+
 </style>

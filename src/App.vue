@@ -2,14 +2,120 @@
   <div class="broadcast-cards">
     <h1>Broadcast Schedule Manager</h1>
 
-    <BroadcastToolbar />
-    <BroadcastCard />
+    <BroadcastToolbar @addCard="startAdding" />
+
+    <BroadcastCard
+        :broadcasts="broadcasts"
+        :is-adding="isAdding"
+        :edit-card-id="editCardId"
+        :overlapping-broadcast-id="overlappingBroadcastId"
+        @onSubmit="onSaveBroadcast"
+        @onEditCard="handleEditCard"
+        @onDeleteCard="handleDeleteCard"
+        @onCancel="onCancelAdd"
+        @onSaveEdit="handleSaveEdit"
+        @onCancelEdit="handleCancelEdit"
+    ></BroadcastCard>
   </div>
 </template>
 
 <script setup lang="ts">
 import BroadcastCard from "@/components/broadcastCard.vue";
 import BroadcastToolbar from "@/components/broadcastToolbar.vue";
+import { Broadcasts } from  "@/broadcasts"
+import { fetchBroadcasts } from "@/apiBroadcasts";
+import { ref, onMounted } from "vue";
+
+const broadcasts = ref<Broadcasts[]>([]);
+const isAdding = ref(false);
+const overlappingBroadcastId = ref<string | null>(null);
+const editCardId = ref<string | null>(null);
+
+const newBroadcast = ref<Broadcasts>({
+  id: "",
+  title: "",
+  channel: "",
+  start: "",
+  end: "",
+});
+
+function startAdding() {
+  isAdding.value = true;
+  newBroadcast.value = { id: "", title: "", channel: "", start: "", end: "" };
+}
+
+function checkIfOverlaps(broadcast: Broadcasts): boolean {
+  const addedStart = new Date(broadcast.start);
+  const addedEnd = new Date(broadcast.end);
+
+  return broadcasts.value.some(data => {
+    if (data.channel !== broadcast.channel) return false;
+
+    const existingStart = new Date(data.start);
+    const existingEnd = new Date(data.end);
+
+    return addedStart < existingEnd && addedEnd > existingStart;
+  });
+}
+
+function onSaveBroadcast(broadcast: Broadcasts) {
+  if (checkIfOverlaps(broadcast)) {
+    overlappingBroadcastId.value = broadcast.id;
+  }
+  console.log(overlappingBroadcastId.value, 'overlappingBroadcastId.value')
+
+  broadcasts.value.unshift(broadcast);
+  isAdding.value = false;
+  seveBroadcastToLocalStorage();
+
+  // console.log(new Date().toISOString().slice(0, 16));
+
+}
+
+function onCancelAdd() {
+  isAdding.value = false;
+}
+
+function handleDeleteCard(id: string) {
+  const indexCard = broadcasts.value.findIndex((broadcast) => broadcast.id === id);
+  if (indexCard !== -1) {
+    broadcasts.value.splice(indexCard, 1);
+  }
+
+  seveBroadcastToLocalStorage();
+}
+
+function handleSaveEdit(editedBroadcast: Broadcasts) {
+  const index = broadcasts.value.findIndex((broadcast) => broadcast.id === editedBroadcast.id);
+  if (index !== -1) {
+    broadcasts.value[index] = editedBroadcast;
+  }
+  editCardId.value = null;
+}
+
+function handleCancelEdit() {
+  editCardId.value = null;
+}
+
+function handleEditCard(id: string) {
+  console.log(id, 'id of the edited card')
+  editCardId.value = id;
+}
+
+function seveBroadcastToLocalStorage() {
+  localStorage.setItem("broadcasts", JSON.stringify(broadcasts.value));
+}
+
+onMounted(async () => {
+  broadcasts.value = await fetchBroadcasts();
+
+  const savedBroadcasts = localStorage.getItem("broadcasts");
+  if (savedBroadcasts) {
+    broadcasts.value = JSON.parse(savedBroadcasts) as Broadcasts[];
+  } else {
+    broadcasts.value = await fetchBroadcasts();
+  }
+});
 
 
 </script>

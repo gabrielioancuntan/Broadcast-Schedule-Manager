@@ -1,54 +1,63 @@
 <template>
-  <div class="add-broadcast">
-    <button class="btn">Add new card</button>
+  <div class="container-fluid">
+    <div class="row gy-3 gx-3 align-items-start add-broadcast">
+      <div class="col-12 col-md-6 col-lg-auto">
+        <button @click="addNewBroadcast" class="custom-btn w-100 w-md-100 w-lg-auto">Add Broadcast Card</button>
+      </div>
 
-    <div class="sort-controls">
-      <div class="sort-bar">
+      <div class="col-12 col-md-6 col-lg-auto">
+        <div class="sort-bar d-flex align-items-center gap-2 w-100">
         <label for="sort" class="sort-label">Sort by time:</label>
-        <select id="sort" class="sort-select">
-          <option value="time-asc">🕒 Time ↑</option>
-          <option value="time-desc">🕒 Time ↓</option>
-        </select>
+          <select id="sort" class="sort-select">
+            <option value="time-asc">🕒 Time ↑</option>
+            <option value="time-desc">🕒 Time ↓</option>
+          </select>
+        </div>
       </div>
 
-      <div class="filter-bar">
+      <div class="col-12 col-md-6 col-lg-auto">
+        <div class="filter-bar d-flex align-items-center gap-2 w-100">
         <label for="type" class="sort-label">Type:</label>
-        <select id="type" class="sort-select">
-          <option value="all">All</option>
-          <option value="news">Channel</option>
-        </select>
+          <select id="type" class="sort-select">
+            <option value="all">All</option>
+            <option value="news">Channel</option>
+          </select>
+        </div>
       </div>
-    </div>
 
-    <div class="search-bar">
-      <input type="text" class="search-input" placeholder="Search broadcasts..." />
+      <div class="col-12 col-md-6 col-lg-auto ms-lg-auto">
+        <div class="search-bar w-100">
+          <input type="text" class="search-input" placeholder="Search broadcasts..." />
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import {defineEmits, ref} from "vue";
+import { timeFilter } from "@/broadcasts"
+
+const filter = ref<timeFilter>('all');
+
+const emit = defineEmits<{
+  addCard: []
+}>();
+
+function addNewBroadcast() {
+  emit("addCard");
+}
 
 </script>
 
 <style scoped>
 .add-broadcast {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
   padding: 20px;
 }
 
-@media (min-width: 768px) {
-  .add-broadcast {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 15px;
-  }
-}
+/* Keep existing custom styles */
 
-.btn {
+.custom-btn {
   background-color: #2A265F;
   border: none;
   border-radius: 8px;
@@ -59,40 +68,13 @@
   letter-spacing: 1px;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.3s ease, color 0.3s ease;
+  width: 100%;
 }
 
-.btn:hover {
+.custom-btn:hover {
   background-color: #f4f4f4;
   color: #2A265F;
   transform: scale(1.05);
-}
-
-.sort-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-@media (min-width: 768px) {
-  .sort-controls {
-    flex-direction: row;
-    align-items: center;
-  }
-}
-
-/* Sort section */
-.sort-bar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.sort-bar,
-.filter-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .sort-label {
@@ -113,6 +95,7 @@
   cursor: pointer;
   appearance: none;
   transition: border-color 0.2s ease, background-color 0.2s ease;
+  width: 100%;
 }
 
 .sort-select:hover {
@@ -121,14 +104,13 @@
 }
 
 .search-bar {
-  flex-grow: 1;
   display: flex;
   justify-content: flex-end;
+  width: 100%;
 }
 
 .search-input {
   width: 100%;
-  max-width: 250px;
   padding: 8px 14px;
   font-size: 14px;
   border: 1px solid #ccc;
@@ -147,5 +129,12 @@
 
 .search-input::placeholder {
   color: #999;
+}
+
+@media (min-width: 768px) {
+  .search-input {
+    min-width: 300px;
+    width: auto;
+  }
 }
 </style>
