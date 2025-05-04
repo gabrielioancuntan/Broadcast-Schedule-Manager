@@ -2,17 +2,21 @@
   <div class="broadcast-cards">
     <h1>Broadcast Schedule Manager</h1>
 
-    <BroadcastToolbar @addCard="startAdding" />
+    <BroadcastToolbar
+        @addCard="startAdding"
+        @filterChange="handleTimeFilterChange"
+        @searchByTitle="handleSearchByTitle"
+    ></BroadcastToolbar>
 
     <BroadcastCard
-        :broadcasts="broadcasts"
+        :broadcasts="filteredBroadcasts"
         :is-adding="isAdding"
         :edit-card-id="editCardId"
         :overlapping-broadcast-id="overlappingBroadcastId"
-        @onSubmit="onSaveBroadcast"
+        @onSubmit="handleSaveBroadcast"
         @onEditCard="handleEditCard"
         @onDeleteCard="handleDeleteCard"
-        @onCancel="onCancelAdd"
+        @onCancel="handleCancelAdd"
         @onSaveEdit="handleSaveEdit"
         @onCancelEdit="handleCancelEdit"
     ></BroadcastCard>
@@ -22,14 +26,16 @@
 <script setup lang="ts">
 import BroadcastCard from "@/components/broadcastCard.vue";
 import BroadcastToolbar from "@/components/broadcastToolbar.vue";
-import { Broadcasts } from  "@/broadcasts"
+import { Broadcasts, timeFilter } from  "@/broadcasts"
 import { fetchBroadcasts } from "@/apiBroadcasts";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 
 const broadcasts = ref<Broadcasts[]>([]);
 const isAdding = ref(false);
 const overlappingBroadcastId = ref<string | null>(null);
 const editCardId = ref<string | null>(null);
+const getTimeFilter = ref<timeFilter>("time-asc");
+const searchQuery = ref('');
 
 const newBroadcast = ref<Broadcasts>({
   id: "",
@@ -37,6 +43,34 @@ const newBroadcast = ref<Broadcasts>({
   channel: "",
   start: "",
   end: "",
+});
+
+function handleTimeFilterChange(filter: timeFilter) {
+  getTimeFilter.value = filter;
+}
+
+function handleSearchByTitle(search: string) {
+  searchQuery.value = search.toLowerCase().trim();
+}
+
+const filteredBroadcasts = computed(() => {
+  let list = [...broadcasts.value];
+
+  // Filter by title first
+  if (searchQuery.value) {
+    list = list.filter(broadcast =>
+        broadcast.title.toLowerCase().includes(searchQuery.value)
+    );
+  }
+
+  // Then sort
+  if (getTimeFilter.value === "time-asc") {
+    list.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+  } else if (getTimeFilter.value === "time-desc") {
+    list.sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime());
+  }
+
+  return list;
 });
 
 function startAdding() {
@@ -58,7 +92,7 @@ function checkIfOverlaps(broadcast: Broadcasts): boolean {
   });
 }
 
-function onSaveBroadcast(broadcast: Broadcasts) {
+function handleSaveBroadcast(broadcast: Broadcasts) {
   if (checkIfOverlaps(broadcast)) {
     overlappingBroadcastId.value = broadcast.id;
   }
@@ -72,7 +106,7 @@ function onSaveBroadcast(broadcast: Broadcasts) {
 
 }
 
-function onCancelAdd() {
+function handleCancelAdd() {
   isAdding.value = false;
 }
 
@@ -91,6 +125,7 @@ function handleSaveEdit(editedBroadcast: Broadcasts) {
     broadcasts.value[index] = editedBroadcast;
   }
   editCardId.value = null;
+  seveBroadcastToLocalStorage();
 }
 
 function handleCancelEdit() {

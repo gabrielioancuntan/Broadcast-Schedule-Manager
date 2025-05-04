@@ -6,4 +6,4 @@ export interface Broadcasts {
     end: string;
 }
 
-export type timeFilter = "all" | "start" | "end";
+export type timeFilter = "time-asc" | "time-desc";

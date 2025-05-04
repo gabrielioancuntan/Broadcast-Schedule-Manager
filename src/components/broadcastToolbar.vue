@@ -8,7 +8,7 @@
       <div class="col-12 col-md-6 col-lg-auto">
         <div class="sort-bar d-flex align-items-center gap-2 w-100">
         <label for="sort" class="sort-label">Sort by time:</label>
-          <select id="sort" class="sort-select">
+          <select v-model="filter" @change="onFilterChange" id="sort" class="sort-select">
             <option value="time-asc">🕒 Time ↑</option>
             <option value="time-desc">🕒 Time ↓</option>
           </select>
@@ -18,7 +18,7 @@
       <div class="col-12 col-md-6 col-lg-auto">
         <div class="filter-bar d-flex align-items-center gap-2 w-100">
         <label for="type" class="sort-label">Type:</label>
-          <select id="type" class="sort-select">
+          <select @change="filterByChannel" id="type" class="sort-select">
             <option value="all">All</option>
             <option value="news">Channel</option>
           </select>
@@ -27,7 +27,13 @@
 
       <div class="col-12 col-md-6 col-lg-auto ms-lg-auto">
         <div class="search-bar w-100">
-          <input type="text" class="search-input" placeholder="Search broadcasts..." />
+          <input
+              class="search-input"
+              v-model="search"
+              @input="searchByTitle"
+              type="text"
+              placeholder="Search by title..."
+          />
         </div>
       </div>
     </div>
@@ -35,14 +41,25 @@
 </template>
 
 <script setup lang="ts">
-import {defineEmits, ref} from "vue";
+import { defineEmits, ref } from "vue";
 import { timeFilter } from "@/broadcasts"
 
-const filter = ref<timeFilter>('all');
 
 const emit = defineEmits<{
-  addCard: []
+  addCard: [],
+  filterChange: [filter: timeFilter],
+  searchByTitle: [query: string],
 }>();
+
+const filter = ref<timeFilter>("time-asc");
+const search = ref('');
+
+function onFilterChange() {
+  emit("filterChange", filter.value);
+}
+function searchByTitle() {
+  emit("searchByTitle", search.value);
+}
 
 function addNewBroadcast() {
   emit("addCard");

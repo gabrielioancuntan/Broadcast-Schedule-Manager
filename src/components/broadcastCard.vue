@@ -1,28 +1,18 @@
 <template>
-<!--  <div-->
-<!--      v-if="editCardId === broadcast.id"-->
-<!--      class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3"-->
-<!--  >-->
-<!--    <addBroadcastCard-->
-<!--        :initial-values="broadcast"-->
-<!--        @onSubmit="saveEdit"-->
-<!--        @onCancel="cancelEdit"-->
-<!--    />-->
-<!--  </div>-->
-
+<!--  add new card-->
   <div v-if="props.isAdding" class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3">
     <addBroadcastCard @onSubmit="handleSubmit" @onCancel="handleCancel" />
   </div>
 
+<!--  render or edit card-->
   <div class="row g-4 px-3 broadcast-card-list">
-    <div
+      <div
+        v-for="broadcast in props.broadcasts"
         class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3"
         :class="{ 'is-overlap': broadcast.id === props.overlappingBroadcastId }"
-        v-for="broadcast in props.broadcasts"
         :key="broadcast.id"
     >
 
-      <!-- Show editable form if this card is being edited -->
       <addBroadcastCard
           v-if="editCardId === broadcast.id"
           :initial-values="broadcast"
@@ -30,26 +20,25 @@
           @onCancel="cancelEdit"
       />
 
-<div v-else>
-  <div class="broadcast-card h-100">
-    <div class="broadcast-preview">
-      <h3>Time schedule</h3>
-      <p>Starts at: {{broadcast.start}}</p>
-      <p>Ends at: {{broadcast.end}}</p>
-    </div>
-    <div class="broadcast-info">
-      <div class="broadcast-channel-message">
-        <h6>{{ broadcast.channel }}</h6>
-        <h2>{{broadcast.title}}</h2>
+      <div v-else>
+        <div class="broadcast-card h-100">
+          <div class="broadcast-preview">
+            <h3>Time schedule</h3>
+            <p>Starts at: {{broadcast.start}}</p>
+            <p>Ends at: {{broadcast.end}}</p>
+          </div>
+          <div class="broadcast-info">
+            <div class="broadcast-channel-message">
+              <h6>{{ broadcast.channel }}</h6>
+              <h2>{{broadcast.title}}</h2>
+            </div>
+            <div class="broadcast-edit-delete mt-auto">
+              <p @click="editCard( broadcast.id)" class="edit-broadcast"><i class="fa-solid fa-pencil"></i></p>
+              <p @click="deleteCard(broadcast.id)" class="delete-broadcast"><i class="fa-solid fa-trash"></i></p>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="broadcast-edit-delete mt-auto">
-        <p @click="editCard( broadcast.id)" class="edit-broadcast"><i class="fa-solid fa-pencil"></i></p>
-        <p @click="deleteCard(broadcast.id)" class="delete-broadcast"><i class="fa-solid fa-trash"></i></p>
-      </div>
-    </div>
-  </div>
-</div>
-
 
       <div v-if="broadcast.id === props.overlappingBroadcastId" class="error-message">
         This broadcast overlaps with an existing one!
@@ -62,8 +51,8 @@
 
 <script setup lang="ts">
 import addBroadcastCard from "@/components/addBroadcastCard.vue";
-import {defineProps, defineEmits} from 'vue'
-import {Broadcasts} from "@/broadcasts";
+import { defineProps, defineEmits } from 'vue'
+import { Broadcasts } from "@/broadcasts";
 
 const props = defineProps({
   broadcasts: {
@@ -121,7 +110,7 @@ function handleCancel() {
 
 </script>
 
-<style scoped>
+<style>
 .broadcast-card {
   display: flex;
   flex-direction: column;
