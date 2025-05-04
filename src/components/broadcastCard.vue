@@ -23,6 +23,9 @@
       <div v-else>
         <div class="broadcast-card h-100">
           <div class="broadcast-preview">
+            <div v-if="isBroadcastLive(broadcast)" class="live-badge">
+              <span class="red-dot"></span> Live
+            </div>
             <h3>Time schedule</h3>
             <p>Starts at: {{broadcast.start}}</p>
             <p>Ends at: {{broadcast.end}}</p>
@@ -107,6 +110,13 @@ function handleCancel() {
   emit("onCancel")
 }
 
+function isBroadcastLive(broadcast: Broadcasts) {
+  const dateNow = new Date();
+  const start = new Date(broadcast.start);
+  const end = new Date(broadcast.end);
+  return dateNow >= start && dateNow <= end
+}
+
 
 </script>
 
@@ -125,6 +135,7 @@ function handleCancel() {
   background-color: #2A265F;
   color: #fff;
   padding: 20px;
+  position: relative;
 }
 
 .broadcast-preview h3 {
@@ -217,5 +228,28 @@ function handleCancel() {
     border-color: red;
   }
 }
+
+.live-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px; /* 👈 move it to the right */
+  background-color: rgba(255, 0, 0, 0.1);
+  color: red;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.red-dot {
+  width: 8px;
+  height: 8px;
+  background-color: red;
+  border-radius: 50%;
+}
+
 
 </style>

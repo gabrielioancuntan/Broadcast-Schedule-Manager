@@ -3,9 +3,11 @@
     <h1>Broadcast Schedule Manager</h1>
 
     <BroadcastToolbar
+        :channels="uniqueChannels"
         @addCard="startAdding"
         @filterChange="handleTimeFilterChange"
         @searchByTitle="handleSearchByTitle"
+        @channelFilterChange="handleChannelFilterChange"
     ></BroadcastToolbar>
 
     <BroadcastCard
@@ -36,6 +38,7 @@ const overlappingBroadcastId = ref<string | null>(null);
 const editCardId = ref<string | null>(null);
 const getTimeFilter = ref<timeFilter>("time-asc");
 const searchQuery = ref('');
+const channelFilter = ref<string>("all");
 
 const newBroadcast = ref<Broadcasts>({
   id: "",
@@ -44,6 +47,14 @@ const newBroadcast = ref<Broadcasts>({
   start: "",
   end: "",
 });
+
+const uniqueChannels = computed(() => {
+  return broadcasts.value.map(b => b.channel);
+});
+
+function handleChannelFilterChange(channel: string) {
+  channelFilter.value = channel;
+}
 
 function handleTimeFilterChange(filter: timeFilter) {
   getTimeFilter.value = filter;
@@ -61,6 +72,10 @@ const filteredBroadcasts = computed(() => {
     list = list.filter(broadcast =>
         broadcast.title.toLowerCase().includes(searchQuery.value)
     );
+  }
+
+  if (channelFilter.value !== "all") {
+    list = list.filter(broadcast => broadcast.channel.toLowerCase().includes(channelFilter.value.toLocaleLowerCase()));
   }
 
   // Then sort

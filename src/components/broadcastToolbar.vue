@@ -18,9 +18,9 @@
       <div class="col-12 col-md-6 col-lg-auto">
         <div class="filter-bar d-flex align-items-center gap-2 w-100">
         <label for="type" class="sort-label">Type:</label>
-          <select @change="filterByChannel" id="type" class="sort-select">
-            <option value="all">All</option>
-            <option value="news">Channel</option>
+          <select v-model="selectedChannel" @change="filterByChannel" id="type" class="sort-select">
+            <option value="all" selected>All</option>
+            <option v-for="channel in props.channels" :key="channel">{{channel}}</option>
           </select>
         </div>
       </div>
@@ -41,21 +41,27 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits, ref } from "vue";
+import { defineEmits, ref, defineProps } from "vue";
 import { timeFilter } from "@/broadcasts"
+
+const props = defineProps<{
+  channels: string[]
+}>()
 
 
 const emit = defineEmits<{
   addCard: [],
   filterChange: [filter: timeFilter],
   searchByTitle: [query: string],
+  channelFilterChange: [channel: string]
 }>();
 
 const filter = ref<timeFilter>("time-asc");
 const search = ref('');
+const selectedChannel =  ref('all');
 
-function onFilterChange() {
-  emit("filterChange", filter.value);
+function filterByChannel() {
+  emit("channelFilterChange", selectedChannel.value);
 }
 function searchByTitle() {
   emit("searchByTitle", search.value);
