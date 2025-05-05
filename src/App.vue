@@ -10,7 +10,7 @@
         @channelFilterChange="handleChannelFilterChange"
     ></BroadcastToolbar>
 
-    <div v-if="broadcasts.length === 0 && !isAdding" class="empty-state">
+    <div v-if="loaded && broadcasts.length === 0 && !isAdding" class="empty-state">
       <div class="empty-content">
         <p>No broadcasts added yet. Please add a broadcast to get started!</p>
         <img src="@/assets/broadcasting.png" alt="No broadcasts" />
@@ -51,6 +51,7 @@ const getTimeFilter = ref<timeFilter>("time-asc");
 const searchQuery = ref('');
 const channelFilter = ref<string>("all");
 const toast = useToast();
+const loaded = ref(false);
 
 const newBroadcast = ref<Broadcasts>({
   id: "",
@@ -61,7 +62,7 @@ const newBroadcast = ref<Broadcasts>({
 });
 
 const uniqueChannels = computed(() => {
-  const allChannels = broadcasts.value.map(data => data.channel.trim());
+  const allChannels = broadcasts.value.map(data => data.channel.trim().toLowerCase());
   return [...new Set(allChannels)];
 });
 
@@ -183,6 +184,7 @@ onMounted(async () => {
   } else {
     broadcasts.value = await fetchBroadcasts();
   }
+  loaded.value = true;
 
   const savedOverlapId = localStorage.getItem("overlappingBroadcastId");
   if (savedOverlapId) {

@@ -250,13 +250,6 @@ function formatDate(dateStr: string): string {
   animation: pulseBorder 0.6s ease-in-out;
 }
 
-.error-message {
-  margin-top: 10px;
-  color: red;
-  font-weight: 600;
-  text-align: center;
-}
-
 @keyframes pulseBorder {
   0% {
     border-color: red;
