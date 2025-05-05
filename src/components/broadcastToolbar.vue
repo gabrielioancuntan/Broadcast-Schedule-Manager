@@ -60,6 +60,10 @@ const filter = ref<timeFilter>("time-asc");
 const search = ref('');
 const selectedChannel =  ref('all');
 
+function onFilterChange() {
+  emit("filterChange", filter.value);
+}
+
 function filterByChannel() {
   emit("channelFilterChange", selectedChannel.value);
 }

@@ -27,8 +27,11 @@
               <span class="red-dot"></span> Live
             </div>
             <h3>Time schedule</h3>
-            <p>Starts at: {{broadcast.start}}</p>
-            <p>Ends at: {{broadcast.end}}</p>
+<!--            <p>Starts at: {{broadcast.start}}</p>-->
+<!--            <p>Ends at: {{broadcast.end}}</p>-->
+            <p>Starts at: {{ formatDate(broadcast.start) }}</p>
+            <p>Ends at: {{ formatDate(broadcast.end) }}</p>
+
           </div>
           <div class="broadcast-info">
             <div class="broadcast-channel-message">
@@ -50,12 +53,26 @@
     </div>
   </div>
 
+  <teleport to="body">
+    <confirmModal
+        v-if="showDeleteModal"
+        message="Are you sure you want to delete this Broadcast card?"
+        @confirmDelete="confirmDelete"
+        @cancelDelete="cancelDelete"
+    />
+  </teleport>
+
 </template>
 
 <script setup lang="ts">
 import addBroadcastCard from "@/components/addBroadcastCard.vue";
-import { defineProps, defineEmits } from 'vue'
+import confirmModal from "@/components/confirmModal.vue";
+
+import { ref, defineProps, defineEmits } from 'vue'
 import { Broadcasts } from "@/broadcasts";
+
+const showDeleteModal = ref(false);
+const deleteCardId = ref<string | null>(null);
 
 const props = defineProps({
   broadcasts: {
@@ -85,17 +102,31 @@ const emit = defineEmits<{
   onCancelEdit: []
 }>();
 
+function deleteCard(id: string) {
+  console.log("Showing modal for ID:", id);
+  deleteCardId.value = id;
+  showDeleteModal.value = true;
+}
+
+function confirmDelete() {
+  if (deleteCardId.value) {
+    emit("onDeleteCard", deleteCardId.value);
+    showDeleteModal.value = false;
+    deleteCardId.value = null;
+  }
+}
+
+function cancelDelete() {
+  showDeleteModal.value = false;
+  deleteCardId.value = null;
+}
+
 function saveEdit(broadcast: Broadcasts) {
   emit('onSaveEdit', broadcast)
 }
 
 function cancelEdit() {
   emit('onCancelEdit')
-}
-
-function deleteCard(id: string) {
-  console.log(id, 'id of the deleted card')
-  emit("onDeleteCard", id);
 }
 
 function editCard(id: string) {
@@ -117,6 +148,17 @@ function isBroadcastLive(broadcast: Broadcasts) {
   return dateNow >= start && dateNow <= end
 }
 
+function formatDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  return date.toLocaleString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
+}
 
 </script>
 
@@ -250,6 +292,5 @@ function isBroadcastLive(broadcast: Broadcasts) {
   background-color: red;
   border-radius: 50%;
 }
-
 
 </style>

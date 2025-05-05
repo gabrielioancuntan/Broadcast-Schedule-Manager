@@ -31,6 +31,7 @@ import BroadcastToolbar from "@/components/broadcastToolbar.vue";
 import { Broadcasts, timeFilter } from  "@/broadcasts"
 import { fetchBroadcasts } from "@/apiBroadcasts";
 import { ref, onMounted, computed } from "vue";
+import { useToast } from 'vue-toastification'
 
 const broadcasts = ref<Broadcasts[]>([]);
 const isAdding = ref(false);
@@ -39,6 +40,7 @@ const editCardId = ref<string | null>(null);
 const getTimeFilter = ref<timeFilter>("time-asc");
 const searchQuery = ref('');
 const channelFilter = ref<string>("all");
+const toast = useToast();
 
 const newBroadcast = ref<Broadcasts>({
   id: "",
@@ -49,7 +51,8 @@ const newBroadcast = ref<Broadcasts>({
 });
 
 const uniqueChannels = computed(() => {
-  return broadcasts.value.map(b => b.channel);
+  const allChannels = broadcasts.value.map(data => data.channel.trim());
+  return [...new Set(allChannels)];
 });
 
 function handleChannelFilterChange(channel: string) {
@@ -67,7 +70,7 @@ function handleSearchByTitle(search: string) {
 const filteredBroadcasts = computed(() => {
   let list = [...broadcasts.value];
 
-  // Filter by title first
+  // Filter by title
   if (searchQuery.value) {
     list = list.filter(broadcast =>
         broadcast.title.toLowerCase().includes(searchQuery.value)
@@ -78,7 +81,7 @@ const filteredBroadcasts = computed(() => {
     list = list.filter(broadcast => broadcast.channel.toLowerCase().includes(channelFilter.value.toLocaleLowerCase()));
   }
 
-  // Then sort
+  // Sort by time
   if (getTimeFilter.value === "time-asc") {
     list.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
   } else if (getTimeFilter.value === "time-desc") {
@@ -117,7 +120,7 @@ function handleSaveBroadcast(broadcast: Broadcasts) {
   isAdding.value = false;
   seveBroadcastToLocalStorage();
 
-  // console.log(new Date().toISOString().slice(0, 16));
+  toast.success("Broadcast saved!")
 
 }
 
@@ -132,6 +135,7 @@ function handleDeleteCard(id: string) {
   }
 
   seveBroadcastToLocalStorage();
+  toast.success("Broadcast card succesfully deleted!")
 }
 
 function handleSaveEdit(editedBroadcast: Broadcasts) {
@@ -141,6 +145,7 @@ function handleSaveEdit(editedBroadcast: Broadcasts) {
   }
   editCardId.value = null;
   seveBroadcastToLocalStorage();
+  toast.success("Broadcast card succesfully edited!")
 }
 
 function handleCancelEdit() {
@@ -171,6 +176,12 @@ onMounted(async () => {
 </script>
 
 <style>
+
+body, .broadcast-cards {
+  position: static !important;
+  overflow: visible !important;
+  z-index: auto !important;
+}
 .broadcast-cards {
   padding: 20px;
 }
