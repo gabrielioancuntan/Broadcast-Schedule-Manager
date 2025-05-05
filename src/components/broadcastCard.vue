@@ -1,11 +1,11 @@
 <template>
-<!--  add new card-->
-  <div v-if="props.isAdding" class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3">
-    <addBroadcastCard @onSubmit="handleSubmit" @onCancel="handleCancel" />
-  </div>
-
-<!--  render or edit card-->
   <div class="row g-4 px-3 broadcast-card-list">
+
+    <!--  add new card-->
+    <div v-if="props.isAdding" class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3">
+      <addBroadcastCard @onSubmit="handleSubmit" @onCancel="handleCancel" />
+    </div>
+
       <div
         v-for="broadcast in props.broadcasts"
         class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3"
@@ -27,12 +27,10 @@
               <span class="red-dot"></span> Live
             </div>
             <h3>Time schedule</h3>
-<!--            <p>Starts at: {{broadcast.start}}</p>-->
-<!--            <p>Ends at: {{broadcast.end}}</p>-->
             <p>Starts at: {{ formatDate(broadcast.start) }}</p>
             <p>Ends at: {{ formatDate(broadcast.end) }}</p>
-
           </div>
+
           <div class="broadcast-info">
             <div class="broadcast-channel-message">
               <h6>{{ broadcast.channel }}</h6>
@@ -42,15 +40,16 @@
               <p @click="editCard( broadcast.id)" class="edit-broadcast"><i class="fa-solid fa-pencil"></i></p>
               <p @click="deleteCard(broadcast.id)" class="delete-broadcast"><i class="fa-solid fa-trash"></i></p>
             </div>
+            <div class="broadcast-warning" v-if="broadcast.id === props.overlappingBroadcastId">
+              <span class="tooltip-icon" title="This broadcast overlaps with another on the same channel!">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
-      <div v-if="broadcast.id === props.overlappingBroadcastId" class="error-message">
-        This broadcast overlaps with an existing one!
       </div>
-
-    </div>
   </div>
 
   <teleport to="body">
@@ -103,7 +102,6 @@ const emit = defineEmits<{
 }>();
 
 function deleteCard(id: string) {
-  console.log("Showing modal for ID:", id);
   deleteCardId.value = id;
   showDeleteModal.value = true;
 }
@@ -292,5 +290,28 @@ function formatDate(dateStr: string): string {
   background-color: red;
   border-radius: 50%;
 }
+
+.broadcast-warning {
+  position: absolute;
+  top: 15px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(255, 0, 0, 0.1);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.tooltip-icon {
+  color: red;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: bold;
+}
+
+
 
 </style>

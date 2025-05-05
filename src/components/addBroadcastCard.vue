@@ -68,7 +68,6 @@ const newBroadcast = ref({
 });
 
 function broadcastSubmitted() {
-  console.log(newBroadcast.value);
   const id = newBroadcast.value.id || Date.now().toString();
 
   emit('onSubmit', {...newBroadcast.value, id});

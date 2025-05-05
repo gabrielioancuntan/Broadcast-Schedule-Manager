@@ -5,7 +5,7 @@
         <button @click="addNewBroadcast" class="custom-btn w-100 w-md-100 w-lg-auto">Add Broadcast Card</button>
       </div>
 
-      <div class="col-12 col-md-6 col-lg-auto">
+      <div class="col-12 col-md-6 col-lg-auto gx-5">
         <div class="sort-bar d-flex align-items-center gap-2 w-100">
         <label for="sort" class="sort-label">Sort by time:</label>
           <select v-model="filter" @change="onFilterChange" id="sort" class="sort-select">
@@ -79,7 +79,7 @@ function addNewBroadcast() {
 
 <style scoped>
 .add-broadcast {
-  padding: 20px;
+  padding: 20px 5px;
 }
 
 /* Keep existing custom styles */

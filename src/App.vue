@@ -10,18 +10,28 @@
         @channelFilterChange="handleChannelFilterChange"
     ></BroadcastToolbar>
 
-    <BroadcastCard
-        :broadcasts="filteredBroadcasts"
-        :is-adding="isAdding"
-        :edit-card-id="editCardId"
-        :overlapping-broadcast-id="overlappingBroadcastId"
-        @onSubmit="handleSaveBroadcast"
-        @onEditCard="handleEditCard"
-        @onDeleteCard="handleDeleteCard"
-        @onCancel="handleCancelAdd"
-        @onSaveEdit="handleSaveEdit"
-        @onCancelEdit="handleCancelEdit"
-    ></BroadcastCard>
+    <div v-if="broadcasts.length === 0 && !isAdding" class="empty-state">
+      <div class="empty-content">
+        <p>No broadcasts added yet. Please add a broadcast to get started!</p>
+        <img src="@/assets/broadcasting.png" alt="No broadcasts" />
+      </div>
+    </div>
+
+    <div v-else>
+      <BroadcastCard
+          :broadcasts="filteredBroadcasts"
+          :is-adding="isAdding"
+          :edit-card-id="editCardId"
+          :overlapping-broadcast-id="overlappingBroadcastId"
+          @onSubmit="handleSaveBroadcast"
+          @onEditCard="handleEditCard"
+          @onDeleteCard="handleDeleteCard"
+          @onCancel="handleCancelAdd"
+          @onSaveEdit="handleSaveEdit"
+          @onCancelEdit="handleCancelEdit"
+      ></BroadcastCard>
+    </div>
+
   </div>
 </template>
 
@@ -101,7 +111,9 @@ function checkIfOverlaps(broadcast: Broadcasts): boolean {
   const addedEnd = new Date(broadcast.end);
 
   return broadcasts.value.some(data => {
-    if (data.channel !== broadcast.channel) return false;
+    if (data.channel.trim().toLowerCase() !== broadcast.channel.trim().toLowerCase() || data.id === broadcast.id) {
+      return false;
+    }
 
     const existingStart = new Date(data.start);
     const existingEnd = new Date(data.end);
@@ -111,17 +123,19 @@ function checkIfOverlaps(broadcast: Broadcasts): boolean {
 }
 
 function handleSaveBroadcast(broadcast: Broadcasts) {
-  if (checkIfOverlaps(broadcast)) {
+  const isOverlap = checkIfOverlaps(broadcast);
+
+  if (isOverlap) {
     overlappingBroadcastId.value = broadcast.id;
+    localStorage.setItem("overlappingBroadcastId", broadcast.id);
+    toast.warning("This broadcast overlaps with an existing one on the same channel!", {timeout: false});
+  } else {
+    toast.success("Broadcast card successfully deleted!")
   }
-  console.log(overlappingBroadcastId.value, 'overlappingBroadcastId.value')
 
   broadcasts.value.unshift(broadcast);
   isAdding.value = false;
   seveBroadcastToLocalStorage();
-
-  toast.success("Broadcast saved!")
-
 }
 
 function handleCancelAdd() {
@@ -135,7 +149,7 @@ function handleDeleteCard(id: string) {
   }
 
   seveBroadcastToLocalStorage();
-  toast.success("Broadcast card succesfully deleted!")
+  toast.success("Broadcast card successfully deleted!")
 }
 
 function handleSaveEdit(editedBroadcast: Broadcasts) {
@@ -153,7 +167,6 @@ function handleCancelEdit() {
 }
 
 function handleEditCard(id: string) {
-  console.log(id, 'id of the edited card')
   editCardId.value = id;
 }
 
@@ -169,6 +182,11 @@ onMounted(async () => {
     broadcasts.value = JSON.parse(savedBroadcasts) as Broadcasts[];
   } else {
     broadcasts.value = await fetchBroadcasts();
+  }
+
+  const savedOverlapId = localStorage.getItem("overlappingBroadcastId");
+  if (savedOverlapId) {
+    overlappingBroadcastId.value = savedOverlapId;
   }
 });
 
@@ -192,5 +210,27 @@ body, .broadcast-cards {
   color: #2A265F;
   font-size: 24px;
 }
+
+.empty-state {
+  position: relative;
+  height: 70vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-size: contain;
+  margin-top: 2rem;
+}
+
+.empty-content {
+  text-align: center;
+}
+
+.empty-content p {
+  font-size: 1.2rem;
+  color: #2A265F;
+  margin-top: 1rem;
+  font-weight: 500;
+}
+
 
 </style>
