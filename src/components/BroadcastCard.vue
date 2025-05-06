@@ -1,25 +1,27 @@
 <template>
   <div class="row g-4 px-3 broadcast-card-list">
 
-    <!--  add new card-->
+    <!-- add new card -->
     <div v-if="props.isAdding" class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3">
-      <addBroadcastCard @onSubmit="handleSubmit" @onCancel="handleCancel" />
+      <AddBroadcastCard @onSubmit="handleSubmit" @onCancel="handleCancel" />
     </div>
 
+      <!-- render broadcast cards -->
       <div
         v-for="broadcast in props.broadcasts"
         class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3"
         :class="{ 'is-overlap': broadcast.id === props.overlappingBroadcastId }"
         :key="broadcast.id"
     >
-
-      <addBroadcastCard
+        <!-- render edited card -->
+      <AddBroadcastCard
           v-if="editCardId === broadcast.id"
           :initial-values="broadcast"
           @onSubmit="saveEdit"
           @onCancel="cancelEdit"
       />
 
+        <!-- render cards -->
       <div v-else>
         <div class="broadcast-card h-100">
           <div class="broadcast-preview">
@@ -53,7 +55,7 @@
   </div>
 
   <teleport to="body">
-    <confirmModal
+    <ConfirmModal
         v-if="showDeleteModal"
         message="Are you sure you want to delete this Broadcast card?"
         @confirmDelete="confirmDelete"
@@ -64,8 +66,8 @@
 </template>
 
 <script setup lang="ts">
-import addBroadcastCard from "@/components/addBroadcastCard.vue";
-import confirmModal from "@/components/confirmModal.vue";
+import AddBroadcastCard from "@/components/AddBroadcastCard.vue";
+import ConfirmModal from "@/components/ConfirmModal.vue";
 
 import { ref, defineProps, defineEmits } from 'vue'
 import { Broadcasts } from "@/broadcasts";
@@ -172,7 +174,7 @@ function formatDate(dateStr: string): string {
 }
 
 .broadcast-preview {
-  background-color: #2A265F;
+  background: linear-gradient(to right, #2A265F, #4B46A1);
   color: #fff;
   padding: 20px;
   position: relative;
@@ -218,7 +220,6 @@ function formatDate(dateStr: string): string {
   gap: 10px;
 }
 
-/* Buttons */
 .edit-broadcast,
 .delete-broadcast {
   background-color: #2A265F;
@@ -265,7 +266,7 @@ function formatDate(dateStr: string): string {
 .live-badge {
   position: absolute;
   top: 10px;
-  right: 10px; /* 👈 move it to the right */
+  right: 10px;
   background-color: rgba(255, 0, 0, 0.1);
   color: red;
   font-weight: bold;
@@ -304,7 +305,5 @@ function formatDate(dateStr: string): string {
   gap: 4px;
   font-weight: bold;
 }
-
-
 
 </style>

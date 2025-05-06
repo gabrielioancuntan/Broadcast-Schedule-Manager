@@ -32,16 +32,25 @@
       ></BroadcastCard>
     </div>
 
+  <div class="chart-analytics">
+    <ChannelAnalyticsChart
+        v-if="Object.keys(scheduledTimeByChannel).length"
+        :data="scheduledTimeByChannel"
+    ></ChannelAnalyticsChart>
+  </div>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import BroadcastCard from "@/components/broadcastCard.vue";
-import BroadcastToolbar from "@/components/broadcastToolbar.vue";
+import BroadcastCard from "@/components/BroadcastCard.vue";
+import BroadcastToolbar from "@/components/BroadcastToolbar.vue";
 import { Broadcasts, timeFilter } from  "@/broadcasts"
 import { fetchBroadcasts } from "@/apiBroadcasts";
 import { ref, onMounted, computed } from "vue";
 import { useToast } from 'vue-toastification'
+import ChannelAnalyticsChart from "./components/ChannelAnalyticsChart.vue";
+
 
 const broadcasts = ref<Broadcasts[]>([]);
 const isAdding = ref(false);
@@ -88,6 +97,7 @@ const filteredBroadcasts = computed(() => {
     );
   }
 
+  //filter by channel
   if (channelFilter.value !== "all") {
     list = list.filter(broadcast => broadcast.channel.toLowerCase().includes(channelFilter.value.toLocaleLowerCase()));
   }
@@ -160,7 +170,7 @@ function handleSaveEdit(editedBroadcast: Broadcasts) {
   }
   editCardId.value = null;
   seveBroadcastToLocalStorage();
-  toast.success("Broadcast card succesfully edited!")
+  toast.success("Broadcast card successfully edited!")
 }
 
 function handleCancelEdit() {
@@ -174,6 +184,18 @@ function handleEditCard(id: string) {
 function seveBroadcastToLocalStorage() {
   localStorage.setItem("broadcasts", JSON.stringify(broadcasts.value));
 }
+
+const scheduledTimeByChannel = computed(() => {
+  const result: Record<string, number> = {};
+  broadcasts.value.forEach(broadcast => {
+    const start = new Date(broadcast.start).getTime();
+    const end = new Date(broadcast.end).getTime();
+    const durationHours = (end - start) / (1000 * 60 * 60);
+    const channel = broadcast.channel.trim().toLowerCase();
+    result[channel] = (result[channel] || 0) + durationHours;
+  });
+  return result;
+});
 
 onMounted(async () => {
   broadcasts.value = await fetchBroadcasts();
@@ -234,5 +256,8 @@ body, .broadcast-cards {
   font-weight: 500;
 }
 
+.chart-analytics {
+  padding-top: 40px;
+}
 
 </style>

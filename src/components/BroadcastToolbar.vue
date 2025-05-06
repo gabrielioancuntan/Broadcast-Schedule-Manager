@@ -2,10 +2,10 @@
   <div class="container-fluid">
     <div class="row gy-3 gx-3 align-items-start add-broadcast">
       <div class="col-12 col-md-6 col-lg-auto">
-        <button @click="addNewBroadcast" class="custom-btn w-100 w-md-100 w-lg-auto">Add Broadcast Card</button>
+        <button @click="addNewBroadcast" class="add-broadcast-btn w-100 w-md-100 w-lg-auto">Add Broadcast Card</button>
       </div>
 
-      <div class="col-12 col-md-6 col-lg-auto gx-5">
+      <div class="col-12 col-md-6 col-lg-auto gx-3">
         <div class="sort-bar d-flex align-items-center gap-2 w-100">
         <label for="sort" class="sort-label">Sort by time:</label>
           <select v-model="filter" @change="onFilterChange" id="sort" class="sort-select">
@@ -84,7 +84,7 @@ function addNewBroadcast() {
 
 /* Keep existing custom styles */
 
-.custom-btn {
+.add-broadcast-btn {
   background-color: #2A265F;
   border: none;
   border-radius: 8px;
@@ -98,7 +98,7 @@ function addNewBroadcast() {
   width: 100%;
 }
 
-.custom-btn:hover {
+.add-broadcast-btn:hover {
   background-color: #f4f4f4;
   color: #2A265F;
   transform: scale(1.05);
