@@ -92,22 +92,5 @@ const chartOptions = computed(() => ({
 
 </script>
 
-<style scoped>
-.chart-container {
-  max-width: 600px;
-  margin: 2rem auto;
-  text-align: center;
-}
-
-.channel-times {
-  list-style: none;
-  padding: 0;
-  margin-top: 1rem;
-}
-
-.channel-times li {
-  font-weight: 500;
-  color: #2A265F;
-  margin: 0.25rem 0;
-}
+<style>
 </style>
