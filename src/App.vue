@@ -8,6 +8,7 @@
         @filterChange="handleTimeFilterChange"
         @searchByTitle="handleSearchByTitle"
         @channelFilterChange="handleChannelFilterChange"
+        @showAnalytics="handleShowAnalytics"
     ></BroadcastToolbar>
 
     <div v-if="loaded && broadcasts.length === 0 && !isAdding" class="empty-state">
@@ -32,12 +33,19 @@
       ></BroadcastCard>
     </div>
 
-  <div class="chart-analytics">
-    <ChannelAnalyticsChart
-        v-if="Object.keys(scheduledTimeByChannel).length"
-        :data="scheduledTimeByChannel"
-    ></ChannelAnalyticsChart>
-  </div>
+    <div v-if="showChartDrawer" class="drawer-backdrop" @click="showChartDrawer = false">
+      <div class="chart-drawer" @click.stop>
+        <div class="chart-drawer-header">
+          <h4>Channel Analytics</h4>
+          <button @click="showChartDrawer = false" class="close-btn">✖</button>
+        </div>
+        <ChannelAnalyticsChart
+            v-if="Object.keys(scheduledTimeByChannel).length"
+            :data="scheduledTimeByChannel"
+        />
+      </div>
+    </div>
+
 
   </div>
 </template>
@@ -61,6 +69,7 @@ const searchQuery = ref('');
 const channelFilter = ref<string>("all");
 const toast = useToast();
 const loaded = ref(false);
+const showChartDrawer = ref(false);
 
 const newBroadcast = ref<Broadcasts>({
   id: "",
@@ -185,6 +194,10 @@ function seveBroadcastToLocalStorage() {
   localStorage.setItem("broadcasts", JSON.stringify(broadcasts.value));
 }
 
+function handleShowAnalytics() {
+  showChartDrawer.value = true;
+}
+
 const scheduledTimeByChannel = computed(() => {
   const result: Record<string, number> = {};
   broadcasts.value.forEach(broadcast => {
@@ -256,8 +269,52 @@ body, .broadcast-cards {
   font-weight: 500;
 }
 
-.chart-analytics {
-  padding-top: 40px;
+.drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.3); /* Dim effect */
+  backdrop-filter: blur(3px); /* Optional blur */
+  z-index: 1000;
+  display: flex;
 }
+
+.chart-drawer {
+  width: 350px;
+  max-width: 90vw;
+  height: 100%;
+  background: #fff;
+  padding: 20px;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.2);
+  animation: slideInDrawer 0.3s ease-out;
+  overflow-y: auto;
+}
+
+.chart-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #5c5c8a;
+  cursor: pointer;
+}
+
+@keyframes slideInDrawer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
 
 </style>

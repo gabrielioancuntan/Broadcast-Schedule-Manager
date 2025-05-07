@@ -5,18 +5,38 @@
     >
       <div class="broadcast-preview">
         <h3>{{ newBroadcast.id ? 'Edit Broadcast' : 'New Broadcast' }}</h3>
-        <input
+<!--        <input-->
+<!--            v-model="newBroadcast.start"-->
+<!--            type="datetime-local"-->
+<!--            class="form-control my-2"-->
+<!--            required-->
+<!--        />-->
+
+        <VueDatePicker
             v-model="newBroadcast.start"
-            type="datetime-local"
-            class="form-control my-2"
-            required
+            auto-apply
+            :enable-time-picker="true"
+            model-type="iso"
+            format="yyyy-MM-dd HH:mm"
+            placeholder="Select start time"
+            teleport
         />
-        <input
+
+        <!--        <input-->
+<!--            v-model="newBroadcast.end"-->
+<!--            type="datetime-local"-->
+<!--            class="form-control my-2"-->
+<!--            required-->
+<!--        />-->
+        <VueDatePicker
             v-model="newBroadcast.end"
-            type="datetime-local"
-            class="form-control my-2"
-            required
+            :enable-time-picker="true"
+            format="yyyy-MM-dd HH:mm"
+            placeholder="Select end time"
+            class="my-2"
+            teleport
         />
+
       </div>
       <div class="broadcast-info">
         <input
@@ -49,6 +69,8 @@
 <script setup lang="ts">
 import {ref, defineEmits, defineProps, watch } from "vue";
 import type { Broadcasts } from "@/broadcasts";
+import VueDatePicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
 
 const props = defineProps<{
   initialValues?: Broadcasts;

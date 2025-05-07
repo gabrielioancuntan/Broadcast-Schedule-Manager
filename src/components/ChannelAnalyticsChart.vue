@@ -91,6 +91,3 @@ const chartOptions = computed(() => ({
 }));
 
 </script>
-
-<style>
-</style>

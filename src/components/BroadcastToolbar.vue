@@ -2,22 +2,30 @@
   <div class="container-fluid">
     <div class="row gy-3 gx-3 align-items-start add-broadcast">
       <div class="col-12 col-md-6 col-lg-auto">
-        <button @click="addNewBroadcast" class="add-broadcast-btn w-100 w-md-100 w-lg-auto">Add Broadcast Card</button>
-      </div>
-
-      <div class="col-12 col-md-6 col-lg-auto gx-3">
-        <div class="sort-bar d-flex align-items-center gap-2 w-100">
-        <label for="sort" class="sort-label">Sort by time:</label>
-          <select v-model="filter" @change="onFilterChange" id="sort" class="sort-select">
-            <option value="time-asc">🕒 Time ↑</option>
-            <option value="time-desc">🕒 Time ↓</option>
-          </select>
-        </div>
+        <button @click="addNewBroadcast" class="add-broadcast-btn w-100 w-md-100 w-lg-auto">
+          <i class="fa fa-plus me-2"></i> Add
+        </button>
       </div>
 
       <div class="col-12 col-md-6 col-lg-auto">
         <div class="filter-bar d-flex align-items-center gap-2 w-100">
-        <label for="type" class="sort-label">Type:</label>
+          <label for="sort" class="sort-label">Sort by time:</label>
+          <div class="d-flex align-items-center gap-1 flex-grow-1">
+            <select v-model="filter" @change="onFilterChange" id="sort" class="sort-select" style="min-width: 130px;">
+              <option value="time-asc">🕒 Time ↑</option>
+              <option value="time-desc">🕒 Time ↓</option>
+            </select>
+            <button @click="clearSort" class="btn-clear-sort" title="Reset sort">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="col-12 col-md-6 col-lg-auto">
+        <div class="filter-bar d-flex align-items-center gap-2 w-100">
+        <label for="type" class="sort-label">Channel:</label>
           <select v-model="selectedChannel" @change="filterByChannel" id="type" class="sort-select">
             <option value="all" selected>All</option>
             <option v-for="channel in props.channels" :key="channel">{{channel}}</option>
@@ -25,7 +33,13 @@
         </div>
       </div>
 
-      <div class="col-12 col-md-6 col-lg-auto ms-lg-auto">
+      <div class="col-12 col-md-6 col-lg-auto">
+        <button @click="showAnalytics" class="add-broadcast-btn w-100 w-md-100 w-lg-auto">
+          <i class="fa fa-chart-pie me-2"></i>Analytics
+        </button>
+      </div>
+
+      <div class="col-12 col-md-12 col-lg ms-lg-auto">
         <div class="search-bar w-100">
           <input
               class="search-input"
@@ -36,6 +50,7 @@
           />
         </div>
       </div>
+
     </div>
   </div>
 </template>
@@ -53,14 +68,24 @@ const emit = defineEmits<{
   addCard: [],
   filterChange: [filter: timeFilter],
   searchByTitle: [query: string],
-  channelFilterChange: [channel: string]
+  channelFilterChange: [channel: string],
+  showAnalytics: []
 }>();
 
 const filter = ref<timeFilter>("time-asc");
 const search = ref('');
 const selectedChannel =  ref('all');
 
+function showAnalytics() {
+  emit("showAnalytics");
+}
+
 function onFilterChange() {
+  emit("filterChange", filter.value);
+}
+
+function clearSort() {
+  filter.value="time-asc";
   emit("filterChange", filter.value);
 }
 
@@ -82,7 +107,11 @@ function addNewBroadcast() {
   padding: 20px 5px;
 }
 
-/* Keep existing custom styles */
+.filter-bar {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
 
 .add-broadcast-btn {
   background-color: #2A265F;
@@ -91,7 +120,7 @@ function addNewBroadcast() {
   box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
   color: #fff;
   font-size: 16px;
-  padding: 10px 20px;
+  padding: 8px 20px;
   letter-spacing: 1px;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.3s ease, color 0.3s ease;
@@ -123,6 +152,7 @@ function addNewBroadcast() {
   appearance: none;
   transition: border-color 0.2s ease, background-color 0.2s ease;
   width: 100%;
+  max-width: 100%;
 }
 
 .sort-select:hover {
@@ -158,7 +188,31 @@ function addNewBroadcast() {
   color: #999;
 }
 
-@media (min-width: 768px) {
+.btn-clear-sort {
+  background-color: #2A265F;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 37px;
+  min-width: 37px;
+  transition: background-color 0.3s;
+}
+
+.btn-clear-sort:hover {
+  background-color: #4f4aa3;
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .search-input {
+    min-width: 200px;
+    width: 100%;
+  }
+}
+
+@media (min-width: 1200px) {
   .search-input {
     min-width: 300px;
     width: auto;
