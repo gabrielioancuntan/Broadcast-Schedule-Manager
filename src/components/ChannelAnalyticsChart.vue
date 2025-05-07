@@ -79,7 +79,7 @@ const chartOptions = computed(() => ({
     },
     tooltip: {
       callbacks: {
-        label: function(context: any) {
+        label(context: Record<string, never>) {
           const raw = context.raw;
           const hours = Math.floor(raw);
           const minutes = Math.round((raw - hours) * 60);
