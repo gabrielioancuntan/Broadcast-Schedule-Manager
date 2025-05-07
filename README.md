@@ -41,6 +41,8 @@ Vue Router
 
 Chart.js via vue-chart-3
 
+Vue-datepicker
+
 Vue Toastification
 
 FontAwesome
